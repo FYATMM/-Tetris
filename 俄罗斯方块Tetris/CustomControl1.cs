@@ -10,16 +10,16 @@ using System.Windows.Forms;
 
 namespace 俄罗斯方块Tetris
 {
-    public partial class Form1 : Form
+    public partial class CustomControl1 : Control
     {
-        public Form1()
+        public CustomControl1()
         {
             InitializeComponent();
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        protected override void OnPaint(PaintEventArgs pe)
         {
-
+            base.OnPaint(pe);
         }
     }
 }
