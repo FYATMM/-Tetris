@@ -60,18 +60,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomControl1.cs">
+    <Compile Include="View\youxiControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Form1.cs">
+    <Compile Include="View\youxiControl.Designer.cs">
+      <DependentUpon>youxiControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\youxiNext.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="View\youxiNext.Designer.cs">
+      <DependentUpon>youxiNext.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\youxiScore.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="View\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="View\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="View\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -83,6 +94,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="View\youxiNext.resx">
+      <DependentUpon>youxiNext.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -107,6 +121,13 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj">
+      <Project>{ec524350-9ae2-4df0-b18a-ea7ed4271df4}</Project>
+      <Name>Engine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
