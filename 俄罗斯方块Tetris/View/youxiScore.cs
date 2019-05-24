@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Engine;
 
 namespace 俄罗斯方块Tetris
 {
@@ -72,7 +73,7 @@ namespace 俄罗斯方块Tetris
         public void DrawScore(Graphics AGraphics)
         {
             if (AGraphics == null) return;
-            RectangleF vRectangleF = new Rectangle(0, 0, brickWidth * 4, brickHeight);
+            RectangleF vRectangleF = new Rectangle(0, 0, GameSetting.brickWidth * 4, GameSetting.brickHeight);
 
             StringFormat vStringFormat = new StringFormat();
             vStringFormat.FormatFlags |= StringFormatFlags.LineLimit;
@@ -80,25 +81,25 @@ namespace 俄罗斯方块Tetris
 
             AGraphics.DrawString("Score", new Font(Font, FontStyle.Bold), Brushes.White, vRectangleF, vStringFormat);
 
-            vRectangleF.Offset(0, brickHeight);
+            vRectangleF.Offset(0, GameSetting.brickHeight);
 
-            AGraphics.DrawString(score.ToString(), Font, Brushes.White, vRectangleF, vStringFormat);
+            AGraphics.DrawString(GameSetting.score.ToString(), Font, Brushes.White, vRectangleF, vStringFormat);
 
-            vRectangleF.Offset(0, brickHeight);
+            vRectangleF.Offset(0, GameSetting.brickHeight);
 
             AGraphics.DrawString("Level", new Font(Font, FontStyle.Bold),Brushes.White, vRectangleF, vStringFormat);
 
-            vRectangleF.Offset(0, brickHeight);
+            vRectangleF.Offset(0, GameSetting.brickHeight);
 
-            AGraphics.DrawString(level.ToString(), Font,Brushes.White, vRectangleF, vStringFormat);
+            AGraphics.DrawString(GameSetting.level.ToString(), Font,Brushes.White, vRectangleF, vStringFormat);
 
-            vRectangleF.Offset(0, brickHeight);
+            vRectangleF.Offset(0, GameSetting.brickHeight);
 
             AGraphics.DrawString("Lines", new Font(Font, FontStyle.Bold), Brushes.White, vRectangleF, vStringFormat);
 
-            vRectangleF.Offset(0, brickHeight);
+            vRectangleF.Offset(0, GameSetting.brickHeight);
 
-            AGraphics.DrawString(lines.ToString(), Font,Brushes.White, vRectangleF, vStringFormat);
+            AGraphics.DrawString(GameSetting.lines.ToString(), Font,Brushes.White, vRectangleF, vStringFormat);
         }
 
         #endregion

@@ -29,7 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            this.menuStripMain = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,21 +58,21 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.imageList2 = new System.Windows.Forms.ImageList(this.components);
             this.imageList3 = new System.Windows.Forms.ImageList(this.components);
-            this.menuStrip1.SuspendLayout();
+            this.menuStripMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarReviewSpeed)).BeginInit();
             this.SuspendLayout();
             // 
-            // menuStrip1
+            // menuStripMain
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuStripMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.optionToolStripMenuItem,
             this.helpToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(260, 25);
-            this.menuStrip1.TabIndex = 7;
-            this.menuStrip1.Text = "menuStrip1";
+            this.menuStripMain.Location = new System.Drawing.Point(0, 0);
+            this.menuStripMain.Name = "menuStripMain";
+            this.menuStripMain.Size = new System.Drawing.Size(260, 25);
+            this.menuStripMain.TabIndex = 7;
+            this.menuStripMain.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
@@ -92,41 +93,47 @@
             this.replayToolStripMenuItem.Name = "replayToolStripMenuItem";
             this.replayToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.replayToolStripMenuItem.Text = "重新&开始";
+            this.replayToolStripMenuItem.Click += new System.EventHandler(this.replayToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem1.Text = "Replay(Extended)";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.replayExtendedToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem2.Text = "&Save";
+            this.toolStripMenuItem2.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
             this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem3.Text = "&Load";
+            this.toolStripMenuItem3.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // reviewToolStripMenuItem
             // 
             this.reviewToolStripMenuItem.Name = "reviewToolStripMenuItem";
             this.reviewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.reviewToolStripMenuItem.Text = "Re&view";
+            this.reviewToolStripMenuItem.Click += new System.EventHandler(this.reviewToolStripMenuItem_Click);
             // 
             // toolStripMenuItemLine
             // 
             this.toolStripMenuItemLine.Name = "toolStripMenuItemLine";
-            this.toolStripMenuItemLine.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItemLine.Size = new System.Drawing.Size(174, 6);
             // 
             // exiToolStripMenuItem
             // 
             this.exiToolStripMenuItem.Name = "exiToolStripMenuItem";
             this.exiToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exiToolStripMenuItem.Text = "E&xit";
+            this.exiToolStripMenuItem.Click += new System.EventHandler(this.exiToolStripMenuItem_Click);
             // 
             // optionToolStripMenuItem
             // 
@@ -143,27 +150,30 @@
             this.style2ToolStripMenuItem,
             this.style3ToolStripMenuItem});
             this.styleToolStripMenuItem.Name = "styleToolStripMenuItem";
-            this.styleToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.styleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.styleToolStripMenuItem.Text = "&Style";
             // 
             // style1ToolStripMenuItem
             // 
             this.style1ToolStripMenuItem.Name = "style1ToolStripMenuItem";
-            this.style1ToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.style1ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.style1ToolStripMenuItem.Tag = "";
             this.style1ToolStripMenuItem.Text = "style1";
+            this.style1ToolStripMenuItem.Click += new System.EventHandler(this.style1ToolStripMenuItem_Click);
             // 
             // style2ToolStripMenuItem
             // 
             this.style2ToolStripMenuItem.Name = "style2ToolStripMenuItem";
-            this.style2ToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.style2ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.style2ToolStripMenuItem.Text = "style2";
+            this.style2ToolStripMenuItem.Click += new System.EventHandler(this.style1ToolStripMenuItem_Click);
             // 
             // style3ToolStripMenuItem
             // 
             this.style3ToolStripMenuItem.Name = "style3ToolStripMenuItem";
-            this.style3ToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.style3ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.style3ToolStripMenuItem.Text = "style3";
+            this.style3ToolStripMenuItem.Click += new System.EventHandler(this.style1ToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -179,12 +189,14 @@
             this.keyboardToolStripMenuItem.Name = "keyboardToolStripMenuItem";
             this.keyboardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.keyboardToolStripMenuItem.Text = "&操作键";
+            this.keyboardToolStripMenuItem.Click += new System.EventHandler(this.keyBoardToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "&关于";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // progressBarReview
             // 
@@ -201,6 +213,7 @@
             this.buttonLoad.TabIndex = 12;
             this.buttonLoad.Text = "载入";
             this.buttonLoad.UseVisualStyleBackColor = true;
+            this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
             // 
             // buttonSave
             // 
@@ -210,6 +223,7 @@
             this.buttonSave.TabIndex = 11;
             this.buttonSave.Text = "保存";
             this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
             // trackBarReviewSpeed
             // 
@@ -220,6 +234,7 @@
             this.trackBarReviewSpeed.Size = new System.Drawing.Size(75, 45);
             this.trackBarReviewSpeed.TabIndex = 10;
             this.trackBarReviewSpeed.Value = 1;
+            this.trackBarReviewSpeed.Scroll += new System.EventHandler(this.trackBar1_Scroll);
             // 
             // buttonReview
             // 
@@ -229,6 +244,7 @@
             this.buttonReview.TabIndex = 9;
             this.buttonReview.Text = "Re&view";
             this.buttonReview.UseVisualStyleBackColor = true;
+            this.buttonReview.Click += new System.EventHandler(this.buttonReview_Click);
             // 
             // buttonReplay
             // 
@@ -238,6 +254,7 @@
             this.buttonReplay.TabIndex = 8;
             this.buttonReplay.Text = "重新开始";
             this.buttonReplay.UseVisualStyleBackColor = true;
+            this.buttonReplay.Click += new System.EventHandler(this.buttonReplay_Click);
             // 
             // openFileDialog1
             // 
@@ -249,21 +266,39 @@
             // 
             // imageList1
             // 
-            this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "block.png");
+            this.imageList1.Images.SetKeyName(1, "block.png");
+            this.imageList1.Images.SetKeyName(2, "block.png");
+            this.imageList1.Images.SetKeyName(3, "block.png");
+            this.imageList1.Images.SetKeyName(4, "block.png");
+            this.imageList1.Images.SetKeyName(5, "block.png");
+            this.imageList1.Images.SetKeyName(6, "block.png");
             // 
             // imageList2
             // 
-            this.imageList2.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.imageList2.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList2.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList2.ImageStream")));
             this.imageList2.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList2.Images.SetKeyName(0, "block.png");
+            this.imageList2.Images.SetKeyName(1, "block.png");
+            this.imageList2.Images.SetKeyName(2, "block.png");
+            this.imageList2.Images.SetKeyName(3, "block.png");
+            this.imageList2.Images.SetKeyName(4, "block.png");
+            this.imageList2.Images.SetKeyName(5, "block.png");
+            this.imageList2.Images.SetKeyName(6, "block.png");
             // 
             // imageList3
             // 
-            this.imageList3.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.imageList3.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList3.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList3.ImageStream")));
             this.imageList3.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList3.Images.SetKeyName(0, "block.png");
+            this.imageList3.Images.SetKeyName(1, "block.png");
+            this.imageList3.Images.SetKeyName(2, "block.png");
+            this.imageList3.Images.SetKeyName(3, "block.png");
+            this.imageList3.Images.SetKeyName(4, "block.png");
+            this.imageList3.Images.SetKeyName(5, "block.png");
+            this.imageList3.Images.SetKeyName(6, "block.png");
             // 
             // Form1
             // 
@@ -277,12 +312,12 @@
             this.Controls.Add(this.trackBarReviewSpeed);
             this.Controls.Add(this.buttonReview);
             this.Controls.Add(this.buttonReplay);
-            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.menuStripMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
             this.Text = "Form1";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.menuStripMain.ResumeLayout(false);
+            this.menuStripMain.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarReviewSpeed)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -291,7 +326,7 @@
 
         #endregion
 
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.MenuStrip menuStripMain;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem replayToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;

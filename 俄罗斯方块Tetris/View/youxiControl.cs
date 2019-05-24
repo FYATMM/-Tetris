@@ -9,55 +9,57 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using System.IO;
+using Engine;
 
 namespace 俄罗斯方块Tetris
 {
     public partial class youxiControl : Control
     {
         #region 字段
-        private const int rowCount = 21; // 行数
-        private const int colCount = 11; // 列数
+        /*
+        //private const int rowCount = 21; // 行数
+        //private const int colCount = 11; // 列数
 
-        private int brickWidth = 16; // 小块宽度
-        private int brickHeight = 16; // 小块高度
-        private ImageList imageList; // 方块素材
-        private Bitmap backBitmap; // 背景图片
-        private List<List<List<Point>>> brickTemplets = new List<List<List<Point>>>(); // 方块模板[模板序号，朝向]
-        private byte[,] points = new byte[colCount, rowCount]; // 点阵
-        private byte brickIndex = 0; // 模板序号
-        private byte facingIndex = 0; // 当前变化号
-        private Point brickPoint = new Point(); // 方块的位子
-        private byte afterBrickIndex = 0; // 下一个模板序号
-        private byte afterFacingIndex = 0; // 下一个变化号
-        private System.Windows.Forms.Timer timer; // 控制下落的时间器
-        private int lines; // 消行数
-        private Random random = new Random(); // 随即数
-        private int level = 0; // 当前速度
-        private int score = 0; // 成绩        
-        /// 下落速度，数值表示每次下落的时间差，以毫秒为单位  
-        private int[] speeds = new int[] { 700, 500, 400, 300, 200, 200, 100, 80, 70, 60, 50 };     
-        private int[] scoress = new int[] { 0001, 0100, 0300, 0500, 1000, 2000 };/// 每次消除行所增加的积分
-        private bool playing = false; // 玩家是否正在游戏
+        //private int brickWidth = 16; // 小块宽度
+        //private int brickHeight = 16; // 小块高度
+
+        //private byte[,] points = new byte[colCount, rowCount]; // 点阵
+        //private byte brickIndex = 0; // 模板序号
+        //private byte facingIndex = 0; // 当前变化号
+
+        //private byte afterBrickIndex = 0; // 下一个模板序号
+        //private byte afterFacingIndex = 0; // 下一个变化号
+        //private int lines; // 消行数
+        //private Random random = new Random(); // 随即数
+        //private int level = 0; // 当前速度
+        //private int score = 0; // 成绩        
+        ///// 下落速度，数值表示每次下落的时间差，以毫秒为单位  
+        //private int[] speeds = new int[] { 700, 500, 400, 300, 200, 200, 100, 80, 70, 60, 50 };     
+        //private int[] scoress = new int[] { 0001, 0100, 0300, 0500, 1000, 2000 };/// 每次消除行所增加的积分
+        //private bool playing = false; // 玩家是否正在游戏
+        //private int stepIndex = -1; // 当前回放的步数
+        //private bool reviewing = false; // 是否正在回放中
+        //private int reviewSpeed = 1; // 回放的速度，数值表示倍数
+        //private int lastRecordTime = 0; // 最后记录的时间
+        //private bool recordMode = false; // 是否采用记录模式
+        //private bool extended = false; // 扩展方块
+        */
+
+        public static ImageList imageList; // 方块素材
+        public static Bitmap backBitmap; // 背景图片
+
+        public static List<List<List<Point>>> brickTemplets = new List<List<List<Point>>>(); // 方块模板[模板序号，朝向]
+        public static Point brickPoint = new Point(); // 方块的位子
+        public static System.Windows.Forms.Timer timer; // 控制下落的时间器
+        public static Thread threadReview = null; // 回放使用的线程
+        public static List<StepInfo> StepInfos = new List<StepInfo>(); // 记录玩家每一步的操作
+
+        public static ProgressBar progressBar; // 回放进度条
         private youxiNext youxiNext; // 下一个方块的显示控件
         private youxiScore youxiScore; // 积分显示控件
-        private int stepIndex = -1; // 当前回放的步数
-        private bool reviewing = false; // 是否正在回放中
-        private Thread threadReview = null; // 回放使用的线程
-        private int reviewSpeed = 1; // 回放的速度，数值表示倍数
-        private List<StepInfo> StepInfos = new List<StepInfo>(); // 记录玩家每一步的操作
-        private int lastRecordTime = 0; // 最后记录的时间
-        private bool recordMode = false; // 是否采用记录模式
-        private ProgressBar progressBar; // 回放进度条
-        private bool extended = false; // 扩展方块
         #endregion
 
         #region   属性
-        public int Lines { get { return lines; } }/// 消除的行数
-
-        public int Score { get { return score; } }/// 当前的积分
-
-        public int Level { get { return level; } } /// 当前的关数
-
         ///方块的操作
         public enum BrickOperates
         {
@@ -86,32 +88,32 @@ namespace 俄罗斯方块Tetris
         }
         #endregion
 
-       #region 构造函数
-            public youxiControl()
-            {
-                //InitializeComponent();
-                Width = colCount * brickWidth;
-                Height = rowCount * brickHeight;
-                BackColor = Color.Black;
-                NewTemplets(false);
+        #region 构造函数
+        public youxiControl()
+        {
+            //InitializeComponent();
+            Width = GameSetting.colCount * GameSetting.brickWidth;
+            Height = GameSetting.rowCount * GameSetting.brickHeight;
+            BackColor = Color.Black;
+            NewTemplets(false);
 
-                base.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-                base.SetStyle(ControlStyles.Selectable, true);
+            base.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            base.SetStyle(ControlStyles.Selectable, true);
 
-                afterBrickIndex = (byte)random.Next(brickTemplets.Count);
-                afterFacingIndex = (byte)random.Next(brickTemplets[afterBrickIndex].Count);
-                timer = new System.Windows.Forms.Timer();
-                timer.Interval = 100;
-                timer.Tick += new EventHandler(timer_Tick);
-                DoChange();
-                GameOver();
-            }
+            GameSetting.afterBrickIndex = (byte)GameSetting.random.Next(brickTemplets.Count);
+            GameSetting.afterFacingIndex = (byte)GameSetting.random.Next(brickTemplets[GameSetting.afterBrickIndex].Count);
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 100;
+            timer.Tick += new EventHandler(timer_Tick);
+            DoChange();
+            GameOver();
+        }
         #endregion
 
         #region 方法
         private void NewTemplets(bool AExtended)
         {
-            extended = AExtended;
+            GameSetting.extended = AExtended;
             List<List<Point>> templets;
             List<Point> bricks;
 
@@ -487,31 +489,31 @@ namespace 俄罗斯方块Tetris
                 threadReview.Abort();
                 threadReview = null;
             }
-            if (AExtended != extended)
+            if (AExtended != GameSetting.extended)
                 NewTemplets(AExtended);
 
-            reviewing = false;
-            playing = true;
-            recordMode = ARecordMode;
+            GameSetting.reviewing = false;
+            GameSetting.playing = true;
+            GameSetting.recordMode = ARecordMode;
             Clear();
             StepInfos.Clear();
-            afterBrickIndex = (byte)random.Next(brickTemplets.Count);
-            afterFacingIndex = (byte)random.Next(brickTemplets[afterBrickIndex].Count);
+            GameSetting.afterBrickIndex = (byte)GameSetting.random.Next(brickTemplets.Count);
+            GameSetting.afterFacingIndex = (byte)GameSetting.random.Next(brickTemplets[GameSetting.afterBrickIndex].Count);
             if (youxiNext != null) youxiNext.Update(this);
-            if (recordMode && !reviewing)
+            if (GameSetting.recordMode && !GameSetting.reviewing)
             {
-                StepInfos.Add(new StepInfo(0, 0, afterBrickIndex, afterFacingIndex));
-                lastRecordTime = Environment.TickCount;
+                StepInfos.Add(new StepInfo(0, 0, GameSetting.afterBrickIndex, GameSetting.afterFacingIndex));
+                GameSetting.lastRecordTime = Environment.TickCount;
             }
-            level = 0;
-            score = 0;
-            lines = 0;
-            stepIndex = -1;
+            GameSetting.level = 0;
+            GameSetting.score = 0;
+            GameSetting.lines = 0;
+            GameSetting.stepIndex = -1;
             if (progressBar != null) progressBar.Value = 0;
             NextBrick();
-            timer.Interval = speeds[level];
+            timer.Interval = GameSetting.speeds[GameSetting.level];
             timer.Enabled = true;
-            if (youxiScore != null) youxiScore.Update(this);
+            if (youxiScore != null) youxiScore.Update();//if (youxiScore != null) youxiScore.Update(this);
             if (CanFocus) Focus();
         }
 
@@ -520,31 +522,31 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         public void NextStep()
         {
-            if (stepIndex < 0) return;
-            if (stepIndex >= StepInfos.Count) return;
-            switch (StepInfos[stepIndex].command)
+            if (GameSetting.stepIndex < 0) return;
+            if (GameSetting.stepIndex >= StepInfos.Count) return;
+            switch (StepInfos[GameSetting.stepIndex].command)
             {
                 case 0:
-                    afterBrickIndex = StepInfos[stepIndex].param1;
-                    afterFacingIndex = StepInfos[stepIndex].param2;
+                    GameSetting.afterBrickIndex = StepInfos[GameSetting.stepIndex].param1;
+                    GameSetting.afterFacingIndex = StepInfos[GameSetting.stepIndex].param2;
                     break;
                 case 1:
-                    brickIndex = afterBrickIndex;
-                    facingIndex = afterFacingIndex;
-                    brickPoint.X = colCount / 2 - 1;
+                    GameSetting.brickIndex = GameSetting.afterBrickIndex;
+                    GameSetting.facingIndex = GameSetting.afterFacingIndex;
+                    brickPoint.X = GameSetting.colCount / 2 - 1;
                     brickPoint.Y = 0;
 
-                    afterBrickIndex = StepInfos[stepIndex].param1;
-                    afterFacingIndex = StepInfos[stepIndex].param2;
-                    if (youxiNext != null && afterBrickIndex != brickIndex)
+                    GameSetting.afterBrickIndex = StepInfos[GameSetting.stepIndex].param1;
+                    GameSetting.afterFacingIndex = StepInfos[GameSetting.stepIndex].param2;
+                    if (youxiNext != null && GameSetting.afterBrickIndex != GameSetting.brickIndex)
                         youxiNext.Update(this);
                     if (youxiScore != null)
-                        youxiScore.Update(this);
+                        youxiScore.Update(); //youxiScore.Update(this);
                     DrawCurrent(Graphics.FromImage(backBitmap), false);
                     Invalidate();
                     break;
                 case 2:
-                    BrickOperate((BrickOperates)StepInfos[stepIndex].param1);
+                    BrickOperate((BrickOperates)StepInfos[GameSetting.stepIndex].param1);
                     Invalidate();
                     break;
                 case 3:
@@ -552,7 +554,7 @@ namespace 俄罗斯方块Tetris
                     Invalidate();
                     break;
             }
-            stepIndex++;
+            GameSetting.stepIndex++;
         }
 
         /// <summary>
@@ -562,11 +564,11 @@ namespace 俄罗斯方块Tetris
         {
             set
             {
-                reviewSpeed = value > 0 ? value : 1;
+                GameSetting.reviewSpeed = value > 0 ? value : 1;
             }
             get
             {
-                return reviewSpeed;
+                return GameSetting.reviewSpeed;
             }
         }
 
@@ -575,15 +577,15 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         private void DoReview()
         {
-            while (reviewing)
+            while (GameSetting.reviewing)
             {
-                if (stepIndex < 0 || stepIndex >= StepInfos.Count)
+                if (GameSetting.stepIndex < 0 || GameSetting.stepIndex >= StepInfos.Count)
                 {
-                    reviewing = false;
+                    GameSetting.reviewing = false;
                     break;
                 }
-                Thread.Sleep((int)((double)StepInfos[stepIndex].timeTick / reviewSpeed));
-                if (!reviewing) break;
+                Thread.Sleep((int)((double)StepInfos[GameSetting.stepIndex].timeTick / GameSetting.reviewSpeed));
+                if (!GameSetting.reviewing) break;
 
                 Invoke(new EventHandler(DoInvoke));
             }
@@ -596,16 +598,16 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         private void DoInvoke(object sender, EventArgs e)
         {
-            if (reviewing)
+            if (GameSetting.reviewing)
             {
                 NextStep();
-                if (progressBar != null) progressBar.Value = stepIndex;
+                if (progressBar != null) progressBar.Value = GameSetting.stepIndex;
             }
-            else if (playing)
+            else if (GameSetting.playing)
             {
                 if (progressBar != null) progressBar.Value = 0;
                 timer.Enabled = true;
-                lastRecordTime = Environment.TickCount;
+                GameSetting.lastRecordTime = Environment.TickCount;
                 if (CanFocus) Focus();
             }
         }
@@ -621,13 +623,13 @@ namespace 俄罗斯方块Tetris
                 threadReview = null;
             }
             timer.Enabled = false;
-            reviewing = true;
-            playing = true;
+            GameSetting.reviewing = true;
+            GameSetting.playing = true;
             Clear();
-            level = 0;
-            score = 0;
-            lines = 0;
-            stepIndex = 0;
+            GameSetting.level = 0;
+            GameSetting.score = 0;
+            GameSetting.lines = 0;
+            GameSetting.stepIndex = 0;
             NextStep();
             NextStep();
             if (progressBar != null)
@@ -641,7 +643,7 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         public void GameOver()
         {
-            playing = false;
+            GameSetting.playing = false;
             timer.Enabled = false;
         }
 
@@ -650,8 +652,8 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         public void DoChange()
         {
-            Width = brickWidth * colCount;
-            Height = brickHeight * rowCount;
+            Width = GameSetting.brickWidth * GameSetting.colCount;
+            Height = GameSetting.brickHeight * GameSetting.rowCount;
             backBitmap = new Bitmap(Width, Height);
             Graphics vGraphics = Graphics.FromImage(backBitmap);
             vGraphics.FillRectangle(new SolidBrush(BackColor), vGraphics.ClipBounds);
@@ -665,9 +667,9 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         public void Clear()
         {
-            for (int i = 0; i < colCount; i++)
-                for (int j = 0; j < rowCount; j++)
-                    points[i, j] = 0;
+            for (int i = 0; i < GameSetting.colCount; i++)
+                for (int j = 0; j < GameSetting.rowCount; j++)
+                    GameSetting.points[i, j] = 0;
             Graphics vGraphics = Graphics.FromImage(backBitmap);
             vGraphics.FillRectangle(new SolidBrush(BackColor), vGraphics.ClipBounds);
         }
@@ -695,16 +697,16 @@ namespace 俄罗斯方块Tetris
             byte[] vBuffer = new byte[3];
             if (AStream.Read(vBuffer, 0, vBuffer.Length) != 3) return;
             if (vBuffer[0] != 116 || vBuffer[1] != 114 || vBuffer[2] != 102) return;
-            if (colCount != (byte)AStream.ReadByte()) return;
-            if (rowCount != (byte)AStream.ReadByte()) return;
+            if (GameSetting.colCount != (byte)AStream.ReadByte()) return;
+            if (GameSetting.rowCount != (byte)AStream.ReadByte()) return;
             if (threadReview != null)
             {
                 threadReview.Abort(); // 如果正在回放
                 threadReview = null;
             }
             timer.Enabled = false;
-            playing = false;
-            reviewing = false;
+            GameSetting.playing = false;
+            GameSetting.reviewing = false;
             brickTemplets.Clear();
             if (progressBar != null) progressBar.Value = 0;
             int vTempletsCount = AStream.ReadByte();
@@ -770,8 +772,8 @@ namespace 俄罗斯方块Tetris
             if (AStream == null) return;
             byte[] vBuffer = Encoding.ASCII.GetBytes("trf");
             AStream.Write(vBuffer, 0, vBuffer.Length); // 写头信息
-            AStream.WriteByte((byte)colCount);
-            AStream.WriteByte((byte)rowCount);
+            AStream.WriteByte((byte)GameSetting.colCount);
+            AStream.WriteByte((byte)GameSetting.rowCount);
             byte vByte = (byte)brickTemplets.Count;
             AStream.WriteByte(vByte);
             foreach (List<List<Point>> vList in brickTemplets)
@@ -809,12 +811,12 @@ namespace 俄罗斯方块Tetris
         {
             if (ImageList == null) return;
             if (ImageList.Images.Count <= 0) return;
-            if (APoint.X < 0 || APoint.X >= colCount) return;
-            if (APoint.Y < 0 || APoint.Y >= rowCount) return;
+            if (APoint.X < 0 || APoint.X >= GameSetting.colCount) return;
+            if (APoint.Y < 0 || APoint.Y >= GameSetting.rowCount) return;
 
             Rectangle vRectangle = new Rectangle(
-                APoint.X * brickWidth, APoint.Y * brickHeight,
-                brickWidth, brickHeight);
+                APoint.X * GameSetting.brickWidth, APoint.Y * GameSetting.brickHeight,
+                GameSetting.brickWidth, GameSetting.brickHeight);
             AGraphics.FillRectangle(new SolidBrush(BackColor), vRectangle);
             if (ABrick <= 0) return;
             ABrick = (byte)((ABrick - 1) % ImageList.Images.Count);
@@ -830,9 +832,9 @@ namespace 俄罗斯方块Tetris
         {
             if (ImageList == null) return;
             if (ImageList.Images.Count <= 0) return;
-            for (int i = 0; i < colCount; i++)
-                for (int j = 0; j < rowCount; j++)
-                    DrawPoint(AGraphics, new Point(i, j), points[i, j]);
+            for (int i = 0; i < GameSetting.colCount; i++)
+                for (int j = 0; j < GameSetting.rowCount; j++)
+                    DrawPoint(AGraphics, new Point(i, j), GameSetting.points[i, j]);
         }
 
         /// <summary>
@@ -844,10 +846,10 @@ namespace 俄罗斯方块Tetris
         {
             if (ImageList == null) return;
             if (ImageList.Images.Count <= 0) return;
-            foreach (Point vPoint in brickTemplets[brickIndex][facingIndex])
+            foreach (Point vPoint in brickTemplets[GameSetting.brickIndex][GameSetting.facingIndex])
                 DrawPoint(AGraphics, new Point(vPoint.X + brickPoint.X,
                     vPoint.Y + brickPoint.Y),
-                    AClear ? (byte)0 : (byte)(brickIndex + 1));
+                    AClear ? (byte)0 : (byte)(GameSetting.brickIndex + 1));
         }
 
         /// <summary>
@@ -859,9 +861,9 @@ namespace 俄罗斯方块Tetris
             if (AGraphics == null) return;
             if (ImageList == null) return;
             if (ImageList.Images.Count <= 0) return;
-            foreach (Point vPoint in brickTemplets[afterBrickIndex][afterFacingIndex])
+            foreach (Point vPoint in brickTemplets[GameSetting.afterBrickIndex][GameSetting.afterFacingIndex])
                 DrawPoint(AGraphics, new Point(vPoint.X, vPoint.Y),
-                    (byte)(afterBrickIndex + 1));
+                    (byte)(GameSetting.afterBrickIndex + 1));
         }
 
         /// <summary>
@@ -876,10 +878,10 @@ namespace 俄罗斯方块Tetris
             foreach (Point vPoint in brickTemplets[ABrickIndex][AFacingIndex])
             {
                 if (vPoint.X + ABrickPoint.X < 0 ||
-                    vPoint.X + ABrickPoint.X >= colCount) return false;
+                    vPoint.X + ABrickPoint.X >= GameSetting.colCount) return false;
                 if (vPoint.Y + ABrickPoint.Y < 0 ||
-                    vPoint.Y + ABrickPoint.Y >= rowCount) return false;
-                if (points[vPoint.X + ABrickPoint.X,
+                    vPoint.Y + ABrickPoint.Y >= GameSetting.rowCount) return false;
+                if (GameSetting.points[vPoint.X + ABrickPoint.X,
                     vPoint.Y + ABrickPoint.Y] != 0) return false;
             }
             return true;
@@ -891,43 +893,43 @@ namespace 俄罗斯方块Tetris
         public void FreeLine()
         {
             int vFreeCount = 0;
-            for (int j = rowCount - 1; j >= 0; j--)
+            for (int j = GameSetting.rowCount - 1; j >= 0; j--)
             {
                 bool vExistsFull = true; // 是否存在满行
-                for (int i = 0; i < colCount && vExistsFull; i++)
-                    if (points[i, j] == 0)
+                for (int i = 0; i < GameSetting.colCount && vExistsFull; i++)
+                    if (GameSetting.points[i, j] == 0)
                         vExistsFull = false;
                 if (!vExistsFull) continue;
                 #region 图片下移
                 Graphics vGraphics = Graphics.FromImage(backBitmap);
-                Rectangle srcRect = new Rectangle(0, 0, backBitmap.Width, j * brickHeight);
+                Rectangle srcRect = new Rectangle(0, 0, backBitmap.Width, j * GameSetting.brickHeight);
                 Rectangle destRect = srcRect;
-                destRect.Offset(0, brickHeight);
+                destRect.Offset(0, GameSetting.brickHeight);
                 Bitmap vBitmap = new Bitmap(srcRect.Width, srcRect.Height);
                 Graphics.FromImage(vBitmap).DrawImage(backBitmap, 0, 0);
                 vGraphics.DrawImage(vBitmap, destRect, srcRect, GraphicsUnit.Pixel);
                 vGraphics.FillRectangle(new SolidBrush(BackColor), 0, 0,
-                    backBitmap.Width, brickHeight);
+                    backBitmap.Width, GameSetting.brickHeight);
                 #endregion 图片下移
-                lines++;
+                GameSetting.lines++;
                 vFreeCount++;
                 for (int k = j; k >= 0; k--)
                 {
-                    for (int i = 0; i < colCount; i++)
+                    for (int i = 0; i < GameSetting.colCount; i++)
                         if (k == 0)
-                            points[i, k] = 0;
-                        else points[i, k] = points[i, k - 1];
+                            GameSetting.points[i, k] = 0;
+                        else GameSetting.points[i, k] = GameSetting.points[i, k - 1];
                 }
                 j++;
             }
-            score += scoress[vFreeCount];
+            GameSetting.score += GameSetting.scoress[vFreeCount];
             if (vFreeCount > 0)
             {
-                level = Math.Min(lines / 30, speeds.Length - 1);
-                timer.Interval = speeds[level];
+                GameSetting.level = Math.Min(GameSetting.lines / 30, GameSetting.speeds.Length - 1);
+                timer.Interval = GameSetting.speeds[GameSetting.level];
                 Invalidate();
             }
-            if (youxiScore != null) youxiScore.Update(this);
+            if (youxiScore != null) youxiScore.Update();//if (youxiScore != null) youxiScore.Update(this);
         }
 
         /// <summary>
@@ -938,18 +940,18 @@ namespace 俄罗斯方块Tetris
         public bool BrickOperate(BrickOperates ABrickOperates)
         {
 
-            byte vFacingIndex = facingIndex;
+            byte vFacingIndex = GameSetting.facingIndex;
             Point vBrickPoint = brickPoint;
 
             switch (ABrickOperates)
             {
                 case BrickOperates.boTurnLeft:
                     vFacingIndex = (byte)((vFacingIndex + 1) %
-                        brickTemplets[brickIndex].Count);
+                        brickTemplets[GameSetting.brickIndex].Count);
                     break;
                 case BrickOperates.boTurnRight:
-                    vFacingIndex = (byte)((brickTemplets[brickIndex].Count +
-                        vFacingIndex - 1) % brickTemplets[brickIndex].Count);
+                    vFacingIndex = (byte)((brickTemplets[GameSetting.brickIndex].Count +
+                        vFacingIndex - 1) % brickTemplets[GameSetting.brickIndex].Count);
                     break;
                 case BrickOperates.boMoveLeft:
                     vBrickPoint.Offset(-1, 0);
@@ -962,23 +964,23 @@ namespace 俄罗斯方块Tetris
                     break;
                 case BrickOperates.boMoveBottom:
                     vBrickPoint.Offset(0, +1);
-                    while (CheckBrick(brickIndex, vFacingIndex, vBrickPoint))
+                    while (CheckBrick(GameSetting.brickIndex, vFacingIndex, vBrickPoint))
                         vBrickPoint.Offset(0, +1);
                     vBrickPoint.Offset(0, -1);
                     break;
             }
-            if (CheckBrick(brickIndex, vFacingIndex, vBrickPoint))
+            if (CheckBrick(GameSetting.brickIndex, vFacingIndex, vBrickPoint))
             {
-                if (playing && recordMode && !reviewing)
+                if (GameSetting.playing && GameSetting.recordMode && !GameSetting.reviewing)
                 {
-                    StepInfos.Add(new StepInfo(Environment.TickCount - lastRecordTime,
+                    StepInfos.Add(new StepInfo(Environment.TickCount - GameSetting.lastRecordTime,
                         2, (byte)ABrickOperates, 0));
-                    lastRecordTime = Environment.TickCount;
+                    GameSetting.lastRecordTime = Environment.TickCount;
                 }
 
                 Graphics vGraphics = Graphics.FromImage(backBitmap);
                 DrawCurrent(vGraphics, true);
-                facingIndex = vFacingIndex;
+                GameSetting.facingIndex = vFacingIndex;
                 brickPoint = vBrickPoint;
                 DrawCurrent(vGraphics, false);
                 if (ABrickOperates == BrickOperates.boMoveBottom)
@@ -987,11 +989,11 @@ namespace 俄罗斯方块Tetris
             }
             else if (ABrickOperates == BrickOperates.boMoveDown)
             {
-                if (playing && recordMode && !reviewing)
+                if (GameSetting.playing && GameSetting.recordMode && !GameSetting.reviewing)
                 {
-                    StepInfos.Add(new StepInfo(Environment.TickCount - lastRecordTime,
+                    StepInfos.Add(new StepInfo(Environment.TickCount - GameSetting.lastRecordTime,
                         2, (byte)ABrickOperates, 0));
-                    lastRecordTime = Environment.TickCount;
+                    GameSetting.lastRecordTime = Environment.TickCount;
                 }
                 Downfall();
             }
@@ -1003,26 +1005,26 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         private void NextBrick()
         {
-            brickIndex = afterBrickIndex;
-            facingIndex = afterFacingIndex;
-            brickPoint.X = colCount / 2 - 1;
+            GameSetting.brickIndex = GameSetting.afterBrickIndex;
+            GameSetting.facingIndex = GameSetting.afterFacingIndex;
+            brickPoint.X = GameSetting.colCount / 2 - 1;
             brickPoint.Y = 0;
-            afterBrickIndex = (byte)random.Next(brickTemplets.Count);
-            afterFacingIndex = (byte)random.Next(brickTemplets[afterBrickIndex].Count);
-            if (playing && recordMode && !reviewing)
+            GameSetting.afterBrickIndex = (byte)GameSetting.random.Next(brickTemplets.Count);
+            GameSetting.afterFacingIndex = (byte)GameSetting.random.Next(brickTemplets[GameSetting.afterBrickIndex].Count);
+            if (GameSetting.playing && GameSetting.recordMode && !GameSetting.reviewing)
             {
-                StepInfos.Add(new StepInfo(0, 1, afterBrickIndex, afterFacingIndex));
-                lastRecordTime = Environment.TickCount;
+                StepInfos.Add(new StepInfo(0, 1, GameSetting.afterBrickIndex, GameSetting.afterFacingIndex));
+                GameSetting.lastRecordTime = Environment.TickCount;
             }
-            if (youxiNext != null && afterBrickIndex != brickIndex)
+            if (youxiNext != null && GameSetting.afterBrickIndex != GameSetting.brickIndex)
                 youxiNext.Update(this);
             DrawCurrent(Graphics.FromImage(backBitmap), false);
-            if (!CheckBrick(brickIndex, facingIndex, brickPoint))
+            if (!CheckBrick(GameSetting.brickIndex, GameSetting.facingIndex, brickPoint))
             {
-                if (playing && recordMode && !reviewing)
+                if (GameSetting.playing && GameSetting.recordMode && !GameSetting.reviewing)
                 {
                     StepInfos.Add(new StepInfo(0, 3, 0, 0));
-                    lastRecordTime = Environment.TickCount;
+                    GameSetting.lastRecordTime = Environment.TickCount;
                 }
                 GameOver();
             }
@@ -1034,11 +1036,11 @@ namespace 俄罗斯方块Tetris
         /// </summary>
         private void Downfall()
         {
-            foreach (Point vPoint in brickTemplets[brickIndex][facingIndex])
-                points[vPoint.X + brickPoint.X,
-                    vPoint.Y + brickPoint.Y] = (byte)(brickIndex + 1);
+            foreach (Point vPoint in brickTemplets[GameSetting.brickIndex][GameSetting.facingIndex])
+                GameSetting.points[vPoint.X + brickPoint.X,
+                    vPoint.Y + brickPoint.Y] = (byte)(GameSetting.brickIndex + 1);
             FreeLine();
-            if (playing && !reviewing) NextBrick();
+            if (GameSetting.playing && !GameSetting.reviewing) NextBrick();
         }
 
         private void ImageListRecreateHandle(object sender, EventArgs e)
@@ -1071,14 +1073,14 @@ namespace 俄罗斯方块Tetris
                     imageList = value;
                     if (value != null)
                     {
-                        brickWidth = ImageList.ImageSize.Width;
-                        brickHeight = ImageList.ImageSize.Height;
+                        GameSetting.brickWidth = ImageList.ImageSize.Width;
+                        GameSetting.brickHeight = ImageList.ImageSize.Height;
                         DoChange();
-                        if (!playing && !reviewing) GameOver();
+                        if (!GameSetting.playing && !GameSetting.reviewing) GameOver();
                         if (youxiNext != null)
                         {
                             youxiNext.BackColor = BackColor;
-                            youxiNext.SetSize(brickWidth * 4, brickHeight * 4);
+                            youxiNext.SetSize(GameSetting.brickWidth * 4, GameSetting.brickHeight * 4);
                             youxiNext.Update(this);
                         }
                         value.RecreateHandle += handler;
@@ -1109,7 +1111,7 @@ namespace 俄罗斯方块Tetris
                     youxiNext = value;
                     if (value != null)
                     {
-                        value.SetSize(4 * brickWidth, 4 * brickHeight);
+                        value.SetSize(4 * GameSetting.brickWidth, 4 * GameSetting.brickHeight);
                         value.Update(this);
                         value.Disposed += handler;
                     }
@@ -1138,8 +1140,8 @@ namespace 俄罗斯方块Tetris
                     youxiScore = value;
                     if (value != null)
                     {
-                        value.SetSize(4 * brickWidth, 6 * brickHeight);
-                        value.Update(this);
+                        value.SetSize(4 * GameSetting.brickWidth, 6 * GameSetting.brickHeight);
+                        value.Update();//value.Update(this);
                         value.Disposed += handler;
                     }
                 }
@@ -1172,7 +1174,7 @@ namespace 俄罗斯方块Tetris
                     {
                         progressBar.Minimum = 0;
                         progressBar.Maximum = StepInfos.Count;
-                        progressBar.Value = stepIndex < 0 ? 0 : stepIndex;
+                        progressBar.Value = GameSetting.stepIndex < 0 ? 0 : GameSetting.stepIndex;
                         value.Disposed += handler;
                     }
                 }
@@ -1201,7 +1203,7 @@ namespace 俄罗斯方块Tetris
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-            if (!playing || reviewing) return;
+            if (!GameSetting.playing || GameSetting.reviewing) return;
             switch (e.KeyCode)
             {
                 case Keys.A: // 左移
